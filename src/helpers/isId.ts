@@ -1,0 +1,1 @@
+export const isId = (identifier: string | number): boolean => /^\d+$/.test(String(identifier));

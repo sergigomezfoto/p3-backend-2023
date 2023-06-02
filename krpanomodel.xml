@@ -1,0 +1,39 @@
+<krpano version="1.21" title="example3d">
+
+	<action name="skin_onstart_loadscene" scope="local" autorun="onstart">	
+		<!-- load first scene -->
+		loadscene((isset(startscene) ? startscene : 0), null, MERGE);
+		<!-- set optional startup lookat -->
+		if(isset(startlookat),
+			txtsplit(startlookat, ',', hlookat,vlookat,fov,distortion,architectural);
+			lookat(get(hlookat),get(vlookat),get(fov),get(distortion),get(architectural));
+		);
+	</action>
+
+
+
+
+ <scene name="scene1" title="1" onstart="" thumburl="" lat="" lng="" alt="" heading="">
+    <display depthrange="5,100000"     depthbuffer="true" />
+    <view ox="0" oy="0" oz="0" tx="0" ty="0" tz="0" hlookat="0" vlookat="0" fov="90" />
+    <image>
+        <depthmap url="./3d/scene1/expo01.obj" 
+        depthmap.textured="true"
+        enabled="true"
+        hittest="true"
+        rendermode="3dmodel"
+        textured="true"
+        background="pano"
+        backgroundurl="./3d/scene1/sky.jpg"
+        cull="front"
+        subdiv="0" axis="x+y+z" scale="100"
+        origin="-5|2|10"
+        />
+    </image>
+    <hotspot name="hs1" style="hs_type_text|hs1" url="../assets/w1000/128.jpg"    scale="0.10599999999999987"  tx="1496.9280000000017"  ty="-12.35784634931835"  tz="1566.748483027625"   rx="0.00"  ry="-90.00"  rz="0.00" />
+    <hotspot name="hs2" style="hs_type_text|hs2" url="../assets/w1000/128.jpg"    scale="0.10599999999999987"  tx="1496.9280000000017"  ty="-12.35784634931835"  tz="1566.748483027625"   rx="0.00"  ry="-90.00"  rz="0.00" />
+
+</scene>   
+
+
+</krpano>

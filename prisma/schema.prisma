@@ -1,0 +1,46 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+  //previewFeatures = ["clientExtensions"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Tour {
+  id        Int      @id @default(autoincrement())
+  name      String   @unique
+  scenes    Scene[]
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+}
+
+model Scene {
+  id        Int       @id @default(autoincrement())
+  name      String
+  tour      Tour      @relation(fields: [tourId], references: [id], onDelete: Cascade)
+  tourId    Int
+  hotspots  Hotspot[]
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+
+  @@unique([tourId, name])
+}
+
+model Hotspot {
+  id          Int      @id @default(autoincrement())
+  name        String
+  scene       Scene    @relation(fields: [sceneId], references: [id],onDelete: Cascade)
+  sceneId     Int
+  transform   Json     // tx, ty, tz, rx, ry, rz, scale
+  style       String?  // o style o extraData han d'estar omplerts però ho he de validar a la aplicació, no al model.
+  extraData   Json?    // o style o extraData han d'estar omplerts però ho he de validar a la aplicació, no al model.
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  @@unique([sceneId, name])
+}

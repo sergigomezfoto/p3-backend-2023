@@ -1,0 +1,19 @@
+# docker-compose.yml with version 3 services and volumes for postgres  
+version: '3'
+services:
+  krpano3d:
+    image: postgres
+    container_name: krpano3d
+    restart: always
+    volumes:
+      - dbdata:/var/lib/postgresql/data
+    ports:
+      - 5432:5432
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: sergi
+      POSTGRES_DB: krpano3d
+volumes:
+  dbdata:
+
+
