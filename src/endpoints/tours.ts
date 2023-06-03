@@ -19,16 +19,38 @@ apiRouter.get('/_all_/:structure?', queryErrorHandler(async (req, res) => {
     });
 
    if (structure === 'schema') {
-        const schemaResult = result.map(tour => ({
-            name: tour.name,
-            scenes: tour.scenes.map(scene => ({
-                [scene.name]: scene.hotspots.map(hotspot => hotspot.name)
+    const schemaResult = result.map(tour => ({
+        name: tour.name,
+        tourId: tour.id,
+        scenes: tour.scenes.map(scene => ({
+            sceneName: scene.name,
+            sceneId: scene.id,
+            hotspots: scene.hotspots.map(hotspot => ({
+                hotspotName: hotspot.name,
+                hotspotId: hotspot.id
             }))
-        }));       
+        }))
+    }));    
         res.status(200).json({ ok: true, result: schemaResult });
     }
     else {
-        res.status(200).json({ ok: true, result });
+        
+        const modifiedResult = result.map(tour => {
+            return {
+                ...tour,
+                scenes: tour.scenes.map(scene => {
+                    const { tourId, ...restScene } = scene;
+                    return {
+                        ...restScene,
+                        hotspots: scene.hotspots.map(hotspot => {
+                            const { sceneId, ...restHotspot } = hotspot;
+                            return restHotspot;
+                        }),
+                    };
+                }),
+            };
+        });
+        res.status(200).json({ ok: true, modifiedResult });
 
     }
 }));
@@ -61,14 +83,33 @@ apiRouter.get('/:identifier/:structure?', queryErrorHandler(async (req, res) => 
     if (structure === 'schema') {
         const schemaResult = {
             name: result.name,
+            tourId: result.id,
             scenes: result.scenes.map(scene => ({
-                [scene.name]: scene.hotspots.map(hotspot => hotspot.name)
+                sceneName: scene.name,
+                sceneId: scene.id,
+                hotspots: scene.hotspots.map(hotspot => ({
+                    hotspotName: hotspot.name,
+                    hotspotId: hotspot.id
+                }))
             }))
-        };
+        };    
         res.status(200).json({ ok: true, result: schemaResult });
     }
     else {
-        res.status(200).json({ ok: true, result });
+        const modifiedResult = {
+            ...result,
+            scenes: result.scenes.map(scene => {
+                const { tourId, ...restScene } = scene;
+                return {
+                    ...restScene,
+                    hotspots: scene.hotspots.map(hotspot => {
+                        const { sceneId, ...restHotspot } = hotspot;
+                        return restHotspot;
+                    }),
+                };
+            }),
+        };
+        res.status(200).json({ ok: true, modifiedResult });
     }
 }));
 
@@ -87,6 +128,11 @@ apiRouter.put('/:identifier', queryErrorHandler(async (req, res) => {
     const updatedTour = await prisma.tour.update({
         where: queryIsId ? { id: Number(identifier) } : { name: identifier },
         data: req.body,
+        select:{
+            name:true,
+            id:true,
+            scenes:{include:{hotspots:true}}
+        }
     });
 
     // Prisma decideix llençar un error a update si no es troba res, per això no cal fer la comprovació.
@@ -113,16 +159,16 @@ apiRouter.delete('/:identifier', queryErrorHandler(async (req, res) => {
             },
         },
     });
-    const deletedScenesAndHotspots = tour.scenes.map(scene => ({
-        name: scene.name,
-        deletedHotspots: scene.hotspots.map(hotspot => hotspot.name),
-    }));
+    const colateraldeletions = {
+        deletedScenes: tour.scenes.map(scene => scene.name),
+        deletedHotspots: tour.scenes.flatMap(scene => scene.hotspots.map(hotspot => hotspot.name)),
+    };
     //borro el tour
     const deletedTour = await prisma.tour.delete({
         where: queryIsId ? { id: Number(identifier) } : { name: identifier },
     });
     // prisma llença error si no el troba, per això no cal fer la comprovació.
-    res.status(200).json({ ok: true, deletedTour, deletedScenesAndHotspots });
+    res.status(200).json({ ok: true, deletedTour, colateraldeletions });
 }));
 
 export default apiRouter;

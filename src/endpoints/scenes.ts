@@ -11,12 +11,12 @@ apiRouter.get('/_all_/:structure?', queryErrorHandler(async (req, res) => {
     const { structure } = req.params;
     const result = await prisma.scene.findMany({
         include: {
-            tour:{
-                select:{id:true,name:true}
+            tour: {
+                select: { id: true, name: true }
             },
             hotspots: true,
         }
-        
+
     });
 
     if (structure === 'schema') {
@@ -24,25 +24,39 @@ apiRouter.get('/_all_/:structure?', queryErrorHandler(async (req, res) => {
             name: scene.name,
             id: scene.id,
             tour: scene.tour.name,
-            hotspots: scene.hotspots.map(hotspot => hotspot.name)
+            tourId: scene.tour.id,
+            hotspots: scene.hotspots.map(hotspot => ({
+                hotspotName: hotspot.name,
+                hotspotId: hotspot.id
+            }))
         }));
 
         res.status(200).json({ ok: true, result: schemaResult });
     } else {
-        res.status(200).json({ ok: true, result });
+        const modifiedResult = result.map(scene => {
+            const { tourId, ...restScene } = scene;
+            return {
+                ...restScene,
+                hotspots: scene.hotspots.map(hotspot => {
+                    const { sceneId, ...restHotspot } = hotspot;
+                    return restHotspot;
+                }),
+            };
+        });
+        res.status(200).json({ ok: true, modifiedResult });
     }
 }));
 
 
 apiRouter.get('/_in_tour_/:identifier/:structure?', queryErrorHandler(async (req, res) => {
-    const { identifier,structure } = req.params;
+    const { identifier, structure } = req.params;
     const queryIsId = isId(identifier); // és id?
 
     const result = await prisma.scene.findMany({
         where: queryIsId ? { tourId: Number(identifier) } : { tour: { name: identifier } },
         include: {
-            tour:{
-                select:{id:true,name:true}
+            tour: {
+                select: { id: true, name: true }
             },
             hotspots: true,
         }
@@ -61,12 +75,27 @@ apiRouter.get('/_in_tour_/:identifier/:structure?', queryErrorHandler(async (req
             name: scene.name,
             id: scene.id,
             tour: scene.tour.name,
-            hotspots: scene.hotspots.map(hotspot => hotspot.name)
+            tourId: scene.tour.id,
+            hotspots: scene.hotspots.map(hotspot => ({
+                hotspotName: hotspot.name,
+                hotspotId: hotspot.id
+            }))
+
         }));
 
         res.status(200).json({ ok: true, result: schemaResult });
     } else {
-        res.status(200).json({ ok: true, result });
+        const modifiedResult = result.map(scene => {
+            const { tourId, ...restScene } = scene;
+            return {
+                ...restScene,
+                hotspots: scene.hotspots.map(hotspot => {
+                    const { sceneId, ...restHotspot } = hotspot;
+                    return restHotspot;
+                }),
+            };
+        });
+        res.status(200).json({ ok: true, modifiedResult });
     }
 }));
 
@@ -78,8 +107,8 @@ apiRouter.get('/:identifier/:structure?', queryErrorHandler(async (req, res) => 
     const result = await prisma.scene.findMany({
         where: queryIsId ? { id: Number(identifier) } : { name: identifier },
         include: {
-            tour:{
-                select:{id:true,name:true}
+            tour: {
+                select: { id: true, name: true }
             },
             hotspots: true,
         }
@@ -98,12 +127,26 @@ apiRouter.get('/:identifier/:structure?', queryErrorHandler(async (req, res) => 
             name: scene.name,
             id: scene.id,
             tour: scene.tour.name,
-            hotspots: scene.hotspots.map(hotspot => hotspot.name)
+            tourId: scene.tour.id,
+            hotspots: scene.hotspots.map(hotspot => ({
+                hotspotName: hotspot.name,
+                hotspotId: hotspot.id
+            }))
         }));
 
         res.status(200).json({ ok: true, result: schemaResult });
     } else {
-        res.status(200).json({ ok: true, result });
+        const modifiedResult = result.map(scene => {
+            const { tourId, ...restScene } = scene;
+            return {
+                ...restScene,
+                hotspots: scene.hotspots.map(hotspot => {
+                    const { sceneId, ...restHotspot } = hotspot;
+                    return restHotspot;
+                }),
+            };
+        });
+        res.status(200).json({ ok: true, modifiedResult });
     }
 }));
 
@@ -130,9 +173,17 @@ apiRouter.put('/:id', queryErrorHandler(async (req, res) => {
         select: {
             name: true,
             id: true,
-            tourId: true,
+            tour: {
+                select: {
+                    id: true,
+                    name: true
+                }
+            },
             hotspots: {
-                select: { id: true, name: true }
+                select: {
+                    id: true,
+                    name: true
+                }
             },
         },
     });
@@ -148,8 +199,22 @@ apiRouter.post('/', queryErrorHandler(async (req, res) => {
             ...restData,
             tourId: Number(tourId),
         },
+        include: {
+            tour: {
+                select: {
+                    id: true,
+                    name: true
+                }
+            }
+        }
     });
-    res.status(200).json({ ok: true, newScene });
+    const result = {
+        ...newScene,
+        tour: newScene.tour, // Incluye el tour
+    };
+    delete result.tourId; // Excluye el tourId
+
+    res.status(200).json({ ok: true, newScene: result });
 }));
 
 //DELETE per ID 
@@ -158,23 +223,29 @@ apiRouter.delete('/:id', queryErrorHandler(async (req, res) => {
     const scene = await prisma.scene.findUnique({
         where: { id: Number(id) },
         select: {
-            name: true,
+            id: true,
             hotspots: {
                 select: {
                     name: true,
+                    id: true,
                 },
             },
         },
     });
     const deletedScene = await prisma.scene.delete({
         where: { id: Number(id) },
+        select: {
+            name: true,
+            id: true,
+            tour: { select: { id: true, name: true } },
+        },
     });
 
     // Recuperar els noms de les escenes eliminades i els seus hotspots relacionats
-    const deletedHotspots = scene.hotspots.map(hotspot => hotspot.name);
+    const colateralDeletions = { deletedHotspots: scene.hotspots.map(hotspot => hotspot.name) }
 
     //en delete prisma decideix llençar error si no troba res, per això no cal fer la comprovació
-    res.status(200).json({ ok: true, deletedScene, deletedHotspots });
+    res.status(200).json({ ok: true, deletedScene, colateralDeletions });
 
 }));
 
