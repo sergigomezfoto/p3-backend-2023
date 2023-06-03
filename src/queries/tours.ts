@@ -104,6 +104,7 @@ apiRouter.delete('/:identifier', queryErrorHandler(async (req, res) => {
         where: queryIsId ? { id: Number(identifier) } : { name: identifier },
         select: {
             name: true,
+            id: true,
             scenes: {
                 select: {
                     name: true,

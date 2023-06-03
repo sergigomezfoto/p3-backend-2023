@@ -22,6 +22,7 @@ apiRouter.get('/_all_/:structure?', queryErrorHandler(async (req, res) => {
     if (structure === 'schema') {
         const schemaResult = result.map(scene => ({
             name: scene.name,
+            id: scene.id,
             tour: scene.tour.name,
             hotspots: scene.hotspots.map(hotspot => hotspot.name)
         }));
@@ -33,7 +34,7 @@ apiRouter.get('/_all_/:structure?', queryErrorHandler(async (req, res) => {
 }));
 
 
-apiRouter.get('/_tour_/:identifier/:structure?', queryErrorHandler(async (req, res) => {
+apiRouter.get('/_by_tour_/:identifier/:structure?', queryErrorHandler(async (req, res) => {
     const { identifier,structure } = req.params;
     const queryIsId = isId(identifier); // és id?
 
@@ -58,6 +59,7 @@ apiRouter.get('/_tour_/:identifier/:structure?', queryErrorHandler(async (req, r
     if (structure === 'schema') {
         const schemaResult = result.map(scene => ({
             name: scene.name,
+            id: scene.id,
             tour: scene.tour.name,
             hotspots: scene.hotspots.map(hotspot => hotspot.name)
         }));
@@ -94,6 +96,7 @@ apiRouter.get('/:identifier/:structure?', queryErrorHandler(async (req, res) => 
     if (structure === 'schema') {
         const schemaResult = result.map(scene => ({
             name: scene.name,
+            id: scene.id,
             tour: scene.tour.name,
             hotspots: scene.hotspots.map(hotspot => hotspot.name)
         }));
@@ -125,8 +128,8 @@ apiRouter.put('/:id', queryErrorHandler(async (req, res) => {
             tourId: Number(updatedTourId),
         },
         select: {
-            id: true,
             name: true,
+            id: true,
             tourId: true,
             hotspots: {
                 select: { id: true, name: true }

@@ -30,6 +30,7 @@ apiRouter.get('/_all_/:structure?', queryErrorHandler(async (req, res) => {
     if (structure === 'schema') {
         const schemaResult = result.map(hotspot => ({
             name: hotspot.name,
+            id: hotspot.id,
             scene: hotspot.scene.name,
             tour: hotspot.scene.tour.name
         }));
@@ -69,6 +70,7 @@ apiRouter.get('/_by_tour_scnene/:touridentifier/:sceneidendifier/:structure?', q
     if (structure === 'schema') {
         const schemaResult = result.map(hotspot => ({
             name: hotspot.name,
+            id: hotspot.id,
             scene: scene.name,
             tour: scene.tour.name
         }));
@@ -78,6 +80,51 @@ apiRouter.get('/_by_tour_scnene/:touridentifier/:sceneidendifier/:structure?', q
         res.status(200).json({ ok: true, result });
     }
 }));
+
+apiRouter.get('/_by_tour/:touridentifier/:structure?', queryErrorHandler(async (req, res) => {
+    const { touridentifier, structure } = req.params;
+    const tourQueryIsId = isId(touridentifier); // és id?
+
+    // Obtenim el tour i totes les seves escenes amb els respectius hotspots inclosos
+    const tour = await prisma.tour.findFirst({
+        where: {
+            [tourQueryIsId ? 'id' : 'name']: tourQueryIsId ? Number(touridentifier) : touridentifier,
+        },
+        include: {
+            scenes: {
+                include: {
+                    hotspots: true,
+                },
+            },
+        },
+    });
+
+    if (!tour) {
+        const errorMessage = `El tour amb ${tourQueryIsId ? 'ID' : 'nom'} ${touridentifier} no s'ha trobat.`;
+        throw new Error(errorMessage);
+    }
+
+    // Concatenem tots els hotspots de totes les escenes en un sol array
+    // Cada hotspot inclou també el nom de l'escena a la que pertany
+    const result = tour.scenes.flatMap(scene => scene.hotspots.map(hotspot => ({
+        ...hotspot,
+        scene: scene.name,
+    })));
+
+    if (structure === 'schema') {
+        const schemaResult = result.map(hotspot => ({
+            name: hotspot.name,
+            id: hotspot.id,
+            scene: hotspot.scene,
+            tour: tour.name,
+        }));
+
+        res.status(200).json({ ok: true, result: schemaResult });
+    } else {
+        res.status(200).json({ ok: true, result });
+    }
+}));
+
 
 // hotspot per ID o hotspots per name
 apiRouter.get('/:identifier/:structure?', queryErrorHandler(async (req, res) => {
@@ -116,6 +163,7 @@ apiRouter.get('/:identifier/:structure?', queryErrorHandler(async (req, res) => 
     if (structure === 'schema') {
         const schemaResult = result.map(hotspot => ({
             name: hotspot.name,
+            is: hotspot.id,
             scene: hotspot.scene.name,
             tour: hotspot.scene.tour.name
         }));
