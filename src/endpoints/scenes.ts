@@ -34,7 +34,7 @@ apiRouter.get('/_all_/:structure?', queryErrorHandler(async (req, res) => {
 }));
 
 
-apiRouter.get('/_by_tour_/:identifier/:structure?', queryErrorHandler(async (req, res) => {
+apiRouter.get('/_in_tour_/:identifier/:structure?', queryErrorHandler(async (req, res) => {
     const { identifier,structure } = req.params;
     const queryIsId = isId(identifier); // és id?
 

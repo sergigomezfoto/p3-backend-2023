@@ -2,9 +2,9 @@ import express from 'express';
 import cors from 'cors';
 import morgan from 'morgan';
 import dotenv from 'dotenv';
-import toursRouter from './queries/tours.js';
-import scenesRouter from './queries/scenes.js';
-import hotspotsRouter from './queries/hotspots.js';
+import toursRouter from './endpoints/tours.js';
+import scenesRouter from './endpoints/scenes.js';
+import hotspotsRouter from './endpoints/hotspots.js';
 import { errorHandler } from './helpers/errorHandlers.js';
 
 dotenv.config();

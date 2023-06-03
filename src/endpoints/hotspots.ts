@@ -37,13 +37,17 @@ apiRouter.get('/_all_/:structure?', queryErrorHandler(async (req, res) => {
 
         res.status(200).json({ ok: true, result: schemaResult });
     } else {
-        res.status(200).json({ ok: true, result });
+        const modifiedResult = result.map(hotspot => { // trec del resultat el sceneId que queda penjat i em molesta visualment
+            const { sceneId, ...rest } = hotspot;
+            return rest;
+        });
+        res.status(200).json({ ok: true, modifiedResult });
     }
 }));
 
 //GET hotspots per tour i scene (id o name)
-apiRouter.get('/_by_tour_scnene/:touridentifier/:sceneidendifier/:structure?', queryErrorHandler(async (req, res) => {
-    const { touridentifier,sceneidendifier, structure } = req.params;
+apiRouter.get('/_in_tour_and_scene/:touridentifier/:sceneidendifier/:structure?', queryErrorHandler(async (req, res) => {
+    const { touridentifier, sceneidendifier, structure } = req.params;
     const tourQueryIsId = isId(touridentifier); // és id?
     const sceneQueryIsId = isId(sceneidendifier); // és id?
     const scene = await prisma.scene.findFirst({
@@ -55,8 +59,22 @@ apiRouter.get('/_by_tour_scnene/:touridentifier/:sceneidendifier/:structure?', q
             ]
         },
         include: {
-            hotspots: true,
+            hotspots: {
+                include: {
+
+                    scene: {
+                        select: {
+                            id: true,
+                            name: true,
+                            tour: { select: { id: true, name: true } }
+                        }
+                    }
+                },
+
+            },
             tour: true,
+
+
         },
     });
 
@@ -72,16 +90,22 @@ apiRouter.get('/_by_tour_scnene/:touridentifier/:sceneidendifier/:structure?', q
             name: hotspot.name,
             id: hotspot.id,
             scene: scene.name,
-            tour: scene.tour.name
+            sceneId: scene.id,
+            tour: scene.tour.name,
+            tourId: scene.tour.id
         }));
 
         res.status(200).json({ ok: true, result: schemaResult });
     } else {
-        res.status(200).json({ ok: true, result });
+        const modifiedResult = result.map(hotspot => { // trec del resultat el sceneId que queda penjat i em molesta visualment
+            const { sceneId, ...rest } = hotspot;
+            return rest;
+        });
+        res.status(200).json({ ok: true, modifiedResult });
     }
 }));
 
-apiRouter.get('/_by_tour/:touridentifier/:structure?', queryErrorHandler(async (req, res) => {
+apiRouter.get('/_in_tour/:touridentifier/:structure?', queryErrorHandler(async (req, res) => {
     const { touridentifier, structure } = req.params;
     const tourQueryIsId = isId(touridentifier); // és id?
 
@@ -93,7 +117,16 @@ apiRouter.get('/_by_tour/:touridentifier/:structure?', queryErrorHandler(async (
         include: {
             scenes: {
                 include: {
-                    hotspots: true,
+                    hotspots: {
+                        include: {
+                            scene: {
+                                include: {
+                                    tour: true
+                                }
+                            }
+                        }
+                    }
+                    ,
                 },
             },
         },
@@ -108,7 +141,15 @@ apiRouter.get('/_by_tour/:touridentifier/:structure?', queryErrorHandler(async (
     // Cada hotspot inclou també el nom de l'escena a la que pertany
     const result = tour.scenes.flatMap(scene => scene.hotspots.map(hotspot => ({
         ...hotspot,
-        scene: scene.name,
+        scene: {
+            name: scene.name,
+            id: scene.id,
+            tour: {
+                name: tour.name,
+                id: tour.id
+            }
+        },
+
     })));
 
     if (structure === 'schema') {
@@ -116,7 +157,9 @@ apiRouter.get('/_by_tour/:touridentifier/:structure?', queryErrorHandler(async (
             name: hotspot.name,
             id: hotspot.id,
             scene: hotspot.scene,
+            sceneId: hotspot.sceneId,
             tour: tour.name,
+            tourId: tour.id
         }));
 
         res.status(200).json({ ok: true, result: schemaResult });
@@ -163,9 +206,11 @@ apiRouter.get('/:identifier/:structure?', queryErrorHandler(async (req, res) => 
     if (structure === 'schema') {
         const schemaResult = result.map(hotspot => ({
             name: hotspot.name,
-            is: hotspot.id,
+            id: hotspot.id,
             scene: hotspot.scene.name,
-            tour: hotspot.scene.tour.name
+            sId: hotspot.scene.id,
+            tour: hotspot.scene.tour.name,
+            tId: hotspot.scene.tour.id
         }));
 
         res.status(200).json({ ok: true, result: schemaResult });
