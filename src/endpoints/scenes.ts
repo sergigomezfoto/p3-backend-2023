@@ -43,7 +43,7 @@ apiRouter.get('/_all_/:structure?', queryErrorHandler(async (req, res) => {
                 }),
             };
         });
-        res.status(200).json({ ok: true, modifiedResult });
+        res.status(200).json({ ok: true, result:modifiedResult });
     }
 }));
 
@@ -95,7 +95,7 @@ apiRouter.get('/_in_tour_/:identifier/:structure?', queryErrorHandler(async (req
                 }),
             };
         });
-        res.status(200).json({ ok: true, modifiedResult });
+        res.status(200).json({ ok: true,result: modifiedResult });
     }
 }));
 
@@ -146,7 +146,7 @@ apiRouter.get('/:identifier/:structure?', queryErrorHandler(async (req, res) => 
                 }),
             };
         });
-        res.status(200).json({ ok: true, modifiedResult });
+        res.status(200).json({ ok: true, result:modifiedResult });
     }
 }));
 
@@ -188,7 +188,7 @@ apiRouter.put('/:id', queryErrorHandler(async (req, res) => {
         },
     });
 
-    res.status(200).json({ ok: true, uptdatedScene });
+    res.status(200).json({ ok: true, result:uptdatedScene });
 }));
 
 //POST una scene
@@ -214,7 +214,7 @@ apiRouter.post('/', queryErrorHandler(async (req, res) => {
     };
     delete result.tourId; // Excluye el tourId
 
-    res.status(200).json({ ok: true, newScene: result });
+    res.status(200).json({ ok: true, result });
 }));
 
 //DELETE per ID 
@@ -245,7 +245,7 @@ apiRouter.delete('/:id', queryErrorHandler(async (req, res) => {
     const colateralDeletions = { deletedHotspots: scene.hotspots.map(hotspot => hotspot.name) }
 
     //en delete prisma decideix llençar error si no troba res, per això no cal fer la comprovació
-    res.status(200).json({ ok: true, deletedScene, colateralDeletions });
+    res.status(200).json({ ok: true, result:deletedScene, colateralDeletions });
 
 }));
 

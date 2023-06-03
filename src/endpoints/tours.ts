@@ -50,7 +50,7 @@ apiRouter.get('/_all_/:structure?', queryErrorHandler(async (req, res) => {
                 }),
             };
         });
-        res.status(200).json({ ok: true, modifiedResult });
+        res.status(200).json({ ok: true, result:modifiedResult });
 
     }
 }));
@@ -109,7 +109,7 @@ apiRouter.get('/:identifier/:structure?', queryErrorHandler(async (req, res) => 
                 };
             }),
         };
-        res.status(200).json({ ok: true, modifiedResult });
+        res.status(200).json({ ok: true, result:modifiedResult });
     }
 }));
 
@@ -136,7 +136,7 @@ apiRouter.put('/:identifier', queryErrorHandler(async (req, res) => {
     });
 
     // Prisma decideix llençar un error a update si no es troba res, per això no cal fer la comprovació.
-    res.status(200).json({ ok: true, updatedTour });
+    res.status(200).json({ ok: true, result:updatedTour });
 }));
 
 //DELETE by id or name
@@ -168,7 +168,7 @@ apiRouter.delete('/:identifier', queryErrorHandler(async (req, res) => {
         where: queryIsId ? { id: Number(identifier) } : { name: identifier },
     });
     // prisma llença error si no el troba, per això no cal fer la comprovació.
-    res.status(200).json({ ok: true, deletedTour, colateraldeletions });
+    res.status(200).json({ ok: true, result:deletedTour, colateraldeletions });
 }));
 
 export default apiRouter;

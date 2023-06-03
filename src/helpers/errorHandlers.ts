@@ -1,12 +1,13 @@
+import { Request, Response, NextFunction } from 'express';
 // Middleware dels errors
-const errorHandler = (err, req, res, next) => {
+const errorHandler = (err:Error, req:Request, res:Response, next:NextFunction) => {
   console.error(err);
   res.status(500).json({ ok: false, type: err.constructor.name, error: cleanPrismaError(err).error, message: err.message });
 };
 
 
 // chequeja segons les normes de krpano pels noms dels tours, escenes i hotspots
-const checkName = (name) => {
+const checkName = (name :string) => {
   const nameRegex = /^[a-z][a-z\d_-]*$/;
   if (nameRegex.test(name) && name.length >= 3) {
     return {
@@ -22,7 +23,8 @@ const checkName = (name) => {
 
 
 // carregarnos try-catch i la validació del nom dels camps
-const queryErrorHandler = (handler) => (req, res, next) => {
+const queryErrorHandler = (handler: (req: Request, res: Response, next: NextFunction) => Promise<void>) => 
+(req:Request, res:Response, next:NextFunction) => {
   if (req.body.name) {
     const { valid, message } = checkName(req.body.name);
     if (!valid) {
@@ -32,10 +34,9 @@ const queryErrorHandler = (handler) => (req, res, next) => {
   Promise.resolve(handler(req, res, next)).catch(next);
 }
 
-
 //errors de prisma:
 
-const cleanPrismaError = (error) => {
+const cleanPrismaError = (error:any) => {
   if (error.code === 'P2002') {
     // Error de violació de clau única
     const match = error.message.match(/Unique constraint violation on (\w+)\.(\w+)/);
