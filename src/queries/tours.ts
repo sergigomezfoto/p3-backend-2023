@@ -5,7 +5,7 @@ import { isId } from "../helpers/isId.js";
 
 const apiRouter = Router();
 //GET tots els tours
-apiRouter.get('/_all_tours/:structure?', queryErrorHandler(async (req, res) => {
+apiRouter.get('/_all_/:structure?', queryErrorHandler(async (req, res) => {
     const { structure } = req.params;
 
     const result = await prisma.tour.findMany({
