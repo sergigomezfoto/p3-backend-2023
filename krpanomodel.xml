@@ -1,6 +1,11 @@
 <krpano version="1.21" title="example3d">
 
 
+<action name="accio" scope="local">
+    trace('hoola');  
+</action>
+
+
  <scene name="scene1" title="1" onstart="" thumburl="" lat="" lng="" alt="" heading="">
     <display depthrange="5,100000"     depthbuffer="true" />
     <view ox="0" oy="0" oz="0" tx="0" ty="0" tz="0" hlookat="0" vlookat="0" fov="90" />
@@ -24,6 +29,5 @@
     <hotspot name="hs2" style="hs_type_text|hs2" url="../assets/w1000/128.jpg"    scale="0.10599999999999987"  tx="1496.9280000000017"  ty="-12.35784634931835"  tz="1566.748483027625"   rx="0.00"  ry="-90.00"  rz="0.00" />
 
 </scene>   
-
 
 </krpano>

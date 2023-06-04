@@ -1,3 +1,19 @@
+# EXPLICACIÓ:
+* He posat un diagrama.png amb la imatge gràfica de la bbdd i 
+* un video_explicacio.mkv amb una mica d'explicació del context, ja que la api
+que faig va referida directament a una aplicació feta en KRPANO (https://krpano.com/docu/xml/).
+
+* També hi ha el insomnia_2023-06-04.json que conté els endpoints, 
+* i el insomnia_enviroment_var.json que conté els variables d'entorn del insomnia.
+
+* el arxiu .en és en realitat el .env
+
+#
+#
+#
+#
+
+
 # Backend en Typescript, Express y Prisma
 
 Se trata de hacer un _backend_ usando Typescript, Express y Prisma. El _backend_ implementado en clase es el modelo a seguir. Para alumnos que lo hacen por primera vez y sienten algo de incomodidad, lo ideal es usar el modelo de guía y hacer un _backend_ cercano al original de tal manera que la práctica sea un repaso a fondo. Para los que estén más cómodos, lo ideal es innovar en algun aspecto y salirse parcialmente del modelo en ciertos momentos o explorar algún interés personal.
