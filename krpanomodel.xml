@@ -18,7 +18,9 @@
         origin="-5|2|10"
         />
     </image>
+    
     <hotspot name="hs1" style="hs_type_text|hs1" url="../assets/w1000/128.jpg"    scale="0.10599999999999987"  tx="1496.9280000000017"  ty="-12.35784634931835"  tz="1566.748483027625"   rx="0.00"  ry="-90.00"  rz="0.00" />
+    
     <hotspot name="hs2" style="hs_type_text|hs2" url="../assets/w1000/128.jpg"    scale="0.10599999999999987"  tx="1496.9280000000017"  ty="-12.35784634931835"  tz="1566.748483027625"   rx="0.00"  ry="-90.00"  rz="0.00" />
 
 </scene>   

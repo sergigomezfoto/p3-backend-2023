@@ -8,7 +8,8 @@
 
     "dev": "nodemon src/server.ts",
     "deldb": "ts-node-esm src/db_seed/deleteall.ts",
-    "delseed": "ts-node-esm src/db_seed/deleteall.ts && ts-node-esm src/db_seed/seed.ts"
+    "delseed": "ts-node-esm src/db_seed/deleteall.ts && ts-node-esm src/db_seed/seed.ts",
+    "delseedmulti": "ts-node-esm src/db_seed/delseedmulti.ts"
 
   },
   "keywords": [],

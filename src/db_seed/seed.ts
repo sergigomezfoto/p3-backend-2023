@@ -1,8 +1,10 @@
 import { PrismaClient } from '@prisma/client'
 import { randomToken } from '../helpers/randomToken.js';
 
-//npx prisma db seed (fa seed acumulatiu) 
-//npm run delseed (borra tot i fa seed)
+//npx prisma db seed (fa seed acumulatiu ja que els noms son tokens random de 6 lletres simulant sílabes (uns 2 milions de combinacions)) 
+//npm run delseed (borra tot i fa 1 seed - 2 tours)
+//npm run delseedmulti (borra el que hi ha i fa seed 4 coms - 8 tours)
+
 const prisma = new PrismaClient()
 
 const main = async () => {
