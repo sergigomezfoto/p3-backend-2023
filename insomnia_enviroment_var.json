@@ -1,0 +1,6 @@
+{
+	"apiRoot": "http://localhost:3000/",
+	"tours": "tours",
+	"scenes": "scenes",
+	"hotspots": "hotspots"
+}
