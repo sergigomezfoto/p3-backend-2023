@@ -1,4 +1,5 @@
 
+// es fa servir al seed.ts
 const randomToken = (n: number): string => {
     const vocals: string[] = ['a', 'e', 'i', 'o', 'u'];
     const consonants: string[] = [

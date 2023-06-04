@@ -4,6 +4,7 @@ import { queryErrorHandler } from "../helpers/errorHandlers.js";
 import { isId } from "../helpers/isId.js";
 
 const apiRouter = Router();
+
 //GET tots els tours
 apiRouter.get('/_all_/:structure?', queryErrorHandler(async (req, res) => {
     const { structure } = req.params;
@@ -170,5 +171,7 @@ apiRouter.delete('/:identifier', queryErrorHandler(async (req, res) => {
     // prisma llença error si no el troba, per això no cal fer la comprovació.
     res.status(200).json({ ok: true, result:deletedTour, colateraldeletions });
 }));
+
+
 
 export default apiRouter;

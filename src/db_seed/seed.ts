@@ -1,8 +1,9 @@
 import { PrismaClient } from '@prisma/client'
 import { randomToken } from '../helpers/randomToken.js';
+
+//npx prisma db seed (fa seed acumulatiu) 
+//npm run delseed (borra tot i fa seed)
 const prisma = new PrismaClient()
-
-
 
 const main = async () => {
     const name1 = randomToken(6);

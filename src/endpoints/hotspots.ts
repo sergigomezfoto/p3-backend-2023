@@ -5,7 +5,6 @@ import { isId } from "../helpers/isId.js";
 
 const apiRouter = Router();
 
-
 //GET totes les hotspots a la base de dades
 apiRouter.get('/_all_/:structure?', queryErrorHandler(async (req, res) => {
     const { structure } = req.params;
@@ -106,7 +105,7 @@ apiRouter.get('/_in_tour_and_scene/:touridentifier/:sceneidendifier/:structure?'
         res.status(200).json({ ok: true, result: modifiedResult });
     }
 }));
-
+// get tots els hotspots d'un tour (id o name)
 apiRouter.get('/_in_tour/:touridentifier/:structure?', queryErrorHandler(async (req, res) => {
     const { touridentifier, structure } = req.params;
     const tourQueryIsId = isId(touridentifier); // és id?
@@ -232,29 +231,12 @@ apiRouter.get('/:identifier/:structure?', queryErrorHandler(async (req, res) => 
     }
 }));
 
-//////////////////////////////////////////////////////////VALIDACIONS DELS CAMPS DE POST I PUT TODO: VALIDAR PUT
-const validateTransform = (transform) => {
-    if (!transform) {
-      throw new Error('The "transform" field is required.');
-    }
-  
-    const hasGroup1Keys = ['tx', 'ty', 'tz', 'rx', 'ry', 'rz'].every(key => key in transform);
-    const hasGroup2Keys = 'ath' in transform && 'atv' in transform;
-  
-    if (!(hasGroup1Keys || hasGroup2Keys)) {
-      throw new Error(`The "transform" field must have either 'tx', 'ty', 'tz', 'rx', 'ry', 'rz' or 'atv' 'ath'.`);
-    }
-  };
-  const validateExtraData = (extraData) => {
-    if (typeof extraData !== 'object' || Object.keys(extraData).some(key => typeof extraData[key] !== 'string')) {
-      throw new Error('The "extraData" field must have the correct structure with keys and string values.');
-    }
-  };
 
 // PUT scene per ID
 apiRouter.put('/:id', queryErrorHandler(async (req, res) => {
     const { id } = req.params;
     const { name, sceneId, transform, style, extraData } = req.body;
+
 
     const existingHotspot = await prisma.hotspot.findUnique({
         where: { id: Number(id) },
@@ -299,6 +281,25 @@ apiRouter.put('/:id', queryErrorHandler(async (req, res) => {
 
     res.status(200).json({ ok: true, result: updatedHotspot });
 }));
+
+//////////////////////////////////////////////////////////VALIDACIONS DELS CAMPS DE POST I PUT TODO: VALIDAR PUT TMABÉ
+const validateTransform = (transform) => {
+    if (!transform) {
+      throw new Error('The "transform" field is required.');
+    }
+  
+    const hasGroup1Keys = ['tx', 'ty', 'tz', 'rx', 'ry', 'rz'].every(key => key in transform);
+    const hasGroup2Keys = 'ath' in transform && 'atv' in transform;
+  
+    if (!(hasGroup1Keys || hasGroup2Keys)) {
+      throw new Error(`The "transform" field must have either 'tx', 'ty', 'tz', 'rx', 'ry', 'rz' or 'atv' 'ath'.`);
+    }
+  };
+  const validateExtraData = (extraData) => {
+    if (typeof extraData !== 'object' || Object.keys(extraData).some(key => typeof extraData[key] !== 'string')) {
+      throw new Error('The "extraData" field must have the correct structure with keys and string values.');
+    }
+  };
 
 
 apiRouter.post('/', queryErrorHandler(async (req, res) => {
@@ -345,9 +346,9 @@ apiRouter.post('/', queryErrorHandler(async (req, res) => {
     });
     const result = {
         ...newHotspot,
-        scene: newHotspot.scene, // Incluye el tour
+        scene: newHotspot.scene, 
     };
-    delete result.sceneId; // Excluye el tourId
+    delete result.sceneId; 
 
     res.status(200).json({ ok: true, result });
 }));
@@ -381,7 +382,6 @@ apiRouter.delete('/:id', queryErrorHandler(async (req, res) => {
     // En delete, Prisma decideix llençar un error si no troba res, per això no cal fer la comprovació
     res.status(200).json({ ok: true, result: deletedHotspot });
 }));
-
 
 
 

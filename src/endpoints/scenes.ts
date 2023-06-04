@@ -47,7 +47,7 @@ apiRouter.get('/_all_/:structure?', queryErrorHandler(async (req, res) => {
     }
 }));
 
-
+//GET totes les scenes en un tour nom o id 
 apiRouter.get('/_in_tour_/:identifier/:structure?', queryErrorHandler(async (req, res) => {
     const { identifier, structure } = req.params;
     const queryIsId = isId(identifier); // és id?
@@ -99,7 +99,7 @@ apiRouter.get('/_in_tour_/:identifier/:structure?', queryErrorHandler(async (req
     }
 }));
 
-
+//GET totes les scenes amb mateix nom o escena única per id.
 apiRouter.get('/:identifier/:structure?', queryErrorHandler(async (req, res) => {
     const { identifier, structure } = req.params;
     const queryIsId = isId(identifier); // és id?
@@ -210,9 +210,9 @@ apiRouter.post('/', queryErrorHandler(async (req, res) => {
     });
     const result = {
         ...newScene,
-        tour: newScene.tour, // Incluye el tour
+        tour: newScene.tour, // Icloc el tour
     };
-    delete result.tourId; // Excluye el tourId
+    delete result.tourId; // trec el tourId pe em fa rabia
 
     res.status(200).json({ ok: true, result });
 }));
